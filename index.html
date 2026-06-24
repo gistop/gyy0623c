@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>首页 - 星河科技</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="logo" href="./index.html">星河科技</a>
+      <nav>
+        <a class="active" href="./index.html">首页</a>
+        <a href="./products.html">产品介绍</a>
+        <a href="./contact.html">联系我们</a>
+      </nav>
+    </header>
+
+    <main class="hero">
+      <section>
+        <p class="eyebrow">Digital operations platform</p>
+        <h1>让业务系统更清晰、更高效地运转</h1>
+        <p class="lead">星河科技为企业提供数据看板、自动化流程和客户协作工具。</p>
+        <div style="display: flex; align-items: center; gap: 12px; margin-top: 26px;">
+          <a class="button" href="./products.html" style="margin-top: 0;">查看产品</a>
+          <input type="text" id="message-input" placeholder="输入消息" style="padding: 8px; border: 1px solid #cfd8e3; border-radius: 8px;">
+          <button id="write-btn" style="padding: 8px 16px; background: #1769e0; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">写入</button>
+          <button id="read-btn" style="padding: 8px 16px; background: #1769e0; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">读出</button>
+        </div>
+      </section>
+      <section class="hero-panel">
+        <h2>今日概览</h2>
+        <div class="metric">
+          <span>项目交付率</span>
+          <strong>96%</strong>
+        </div>
+        <div class="metric">
+          <span>客户响应时间</span>
+          <strong>12m</strong>
+        </div>
+      </section>
+    </main>
+    <script src="./script.js"></script>
+    <script>
+      (function() {
+        const writeBtn = document.getElementById('write-btn');
+        const readBtn = document.getElementById('read-btn');
+        const input = document.getElementById('message-input');
+
+        if (writeBtn && readBtn && input) {
+          writeBtn.addEventListener('click', async () => {
+            const message = input.value.trim();
+            if (!message) {
+              alert('请输入消息');
+              return;
+            }
+            try {
+              const res = await fetch('/api/write', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+              });
+              const data = await res.json();
+              if (data.id) {
+                alert('写入成功，ID: ' + data.id);
+                input.value = '';
+              } else {
+                alert('写入失败: ' + (data.error || '未知错误'));
+              }
+            } catch (err) {
+              alert('请求错误: ' + err.message);
+            }
+          });
+
+          readBtn.addEventListener('click', async () => {
+            try {
+              const res = await fetch('/api/read');
+              const data = await res.json();
+              if (data.message) {
+                alert('最新消息: ' + data.message);
+              } else if (data.error) {
+                alert('读出失败: ' + data.error);
+              } else {
+                alert('暂无消息');
+              }
+            } catch (err) {
+              alert('请求错误: ' + err.message);
+            }
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>
